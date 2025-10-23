@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>GDS Deep Dive - GDS Technical Architecture</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">GDS Deep Dive</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-model-card" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Model Card</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-model-card">    
+        <li>
+    <a class="dropdown-item" href="../01_ModelCard_GDS_Details.html">
+ <span class="dropdown-text">Details</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../01_ModelCard_P02_ExecutiveSummary.html">
+ <span class="dropdown-text">Executive Summary</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../01_ModelCard_P03_Architecture.html">
+ <span class="dropdown-text">Architecture</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../01_ModelCard_P04_LearningParadigm.html">
+ <span class="dropdown-text">Learning Paradigm</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../01_ModelCard_P05_Data.html">
+ <span class="dropdown-text">Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../01_ModelCard_P06_Explainability.html">
+ <span class="dropdown-text">Explainability &amp; Interpretability</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-project-chronicle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Project Chronicle</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-project-chronicle">    
+        <li>
+    <a class="dropdown-item" href="../02_Chronicle_GDS.html">
+ <span class="dropdown-text">Concept</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../02_Chronicle_P02_Engineering.html">
+ <span class="dropdown-text">Engineering</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../02_Chronicle_P03_Simulation.html">
+ <span class="dropdown-text">Simulation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../02_Chronicle_P04_Evaluation.html">
+ <span class="dropdown-text">Evaluation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../02_Chronicle_P05_Training_Journey_v2.html">
+ <span class="dropdown-text">Training Journey</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-annexes" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Annexes</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-annexes">    
+        <li>
+    <a class="dropdown-item" href="../GDS_Concept/citations.html">
+ <span class="dropdown-text">Sources &amp; Citations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../GDS_Concept/overview.html">
+ <span class="dropdown-text">ML Blueprint</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#gds-technical-architecture-overview" id="toc-gds-technical-architecture-overview" class="nav-link active" data-scroll-target="#gds-technical-architecture-overview">GDS Technical Architecture Overview</a>
+  <ul class="collapse">
+  <li><a href="#system-design-philosophy" id="toc-system-design-philosophy" class="nav-link" data-scroll-target="#system-design-philosophy">System Design Philosophy</a></li>
+  <li><a href="#core-architecture-layers" id="toc-core-architecture-layers" class="nav-link" data-scroll-target="#core-architecture-layers">Core Architecture Layers</a>
+  <ul class="collapse">
+  <li><a href="#semantic-base-layer-static" id="toc-semantic-base-layer-static" class="nav-link" data-scroll-target="#semantic-base-layer-static">1. Semantic Base Layer (Static)</a></li>
+  <li><a href="#dynamic-context-overlay-runtime" id="toc-dynamic-context-overlay-runtime" class="nav-link" data-scroll-target="#dynamic-context-overlay-runtime">2. Dynamic Context Overlay (Runtime)</a></li>
+  <li><a href="#reasoning-engine" id="toc-reasoning-engine" class="nav-link" data-scroll-target="#reasoning-engine">3. Reasoning Engine</a></li>
+  <li><a href="#learning-subsystem" id="toc-learning-subsystem" class="nav-link" data-scroll-target="#learning-subsystem">4. Learning Subsystem</a></li>
+  </ul></li>
+  <li><a href="#technology-stack" id="toc-technology-stack" class="nav-link" data-scroll-target="#technology-stack">Technology Stack</a></li>
+  <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data Sources</a></li>
+  <li><a href="#implementation-highlights" id="toc-implementation-highlights" class="nav-link" data-scroll-target="#implementation-highlights">Implementation Highlights</a>
+  <ul class="collapse">
+  <li><a href="#storage-optimization-journey" id="toc-storage-optimization-journey" class="nav-link" data-scroll-target="#storage-optimization-journey">Storage Optimization Journey</a></li>
+  <li><a href="#csi-hdc-tokenization" id="toc-csi-hdc-tokenization" class="nav-link" data-scroll-target="#csi-hdc-tokenization">CSI-HDC Tokenization</a></li>
+  <li><a href="#cross-language-capabilities" id="toc-cross-language-capabilities" class="nav-link" data-scroll-target="#cross-language-capabilities">Cross-Language Capabilities</a></li>
+  </ul></li>
+  <li><a href="#current-research-status" id="toc-current-research-status" class="nav-link" data-scroll-target="#current-research-status">Current Research Status</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further Reading</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+<div id="tsparticles"></div>
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">GDS Technical Architecture</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="gds-technical-architecture-overview" class="level1">
+<h1>GDS Technical Architecture Overview</h1>
+<p>This document provides a technical overview of the <strong>Geometrodynamic Semantics (GDS)</strong> research prototype architecture as implemented.</p>
+<section id="system-design-philosophy" class="level2">
+<h2 class="anchored" data-anchor-id="system-design-philosophy">System Design Philosophy</h2>
+<p>GDS models semantic reasoning as a <strong>physics-inspired process</strong> operating over a hyperdimensional concept space. Rather than treating language as statistical patterns, the system represents meaning through:</p>
+<ul>
+<li><strong>Semantic particles</strong>: Concepts encoded as 20,000-dimensional binary HDC vectors</li>
+<li><strong>Geometric relationships</strong>: Knowledge graph edges with physics-inspired properties (mass, valence, affective dimensions)</li>
+<li><strong>Geodesic reasoning</strong>: Path-finding through semantic space using composite cost functions</li>
+</ul>
+</section>
+<section id="core-architecture-layers" class="level2">
+<h2 class="anchored" data-anchor-id="core-architecture-layers">Core Architecture Layers</h2>
+<section id="semantic-base-layer-static" class="level3">
+<h3 class="anchored" data-anchor-id="semantic-base-layer-static">1. Semantic Base Layer (Static)</h3>
+<p>The foundational lexicon built from multiple knowledge sources:</p>
+<ul>
+<li><strong>Storage Format</strong>: Parquet with ZSTD compression (~7.5GB for 340k concepts)</li>
+<li><strong>Conceptual State Injector (CSI-HDC)</strong>: Replaces traditional tokenization with 20,000-dimensional binary hypervectors</li>
+<li><strong>Vector Expansion</strong>: Julia HDC server generates concept hypervectors from 300D embeddings</li>
+<li><strong>Graph Structure</strong>: Curated assertions (ConceptNet) + proximity edges (k-NN via FAISS binary indexing)</li>
+</ul>
+<p><strong>Key Properties Per Concept:</strong></p>
+<ul>
+<li><code>particle_id</code>, <code>concept_id</code>, <code>lemma</code>, <code>language</code></li>
+<li><code>m0</code> (semantic mass/centrality)</li>
+<li>VAD (Valence-Arousal-Dominance) affective dimensions</li>
+<li>20,000-bit binary HDC vector</li>
+<li>Graph connectivity (edges with relation types)</li>
+</ul>
+</section>
+<section id="dynamic-context-overlay-runtime" class="level3">
+<h3 class="anchored" data-anchor-id="dynamic-context-overlay-runtime">2. Dynamic Context Overlay (Runtime)</h3>
+<p><strong>LMDB-backed delta store</strong> for runtime learning:</p>
+<ul>
+<li>Edge weight adjustments during reasoning sessions</li>
+<li>Degree-normalized updates to maintain graph stability</li>
+<li>Checkpointing for session recovery</li>
+<li>Telemetry monitoring (drift detection, margin analysis)</li>
+</ul>
+</section>
+<section id="reasoning-engine" class="level3">
+<h3 class="anchored" data-anchor-id="reasoning-engine">3. Reasoning Engine</h3>
+<p><strong>Path-based semantic reasoning</strong> through the concept graph:</p>
+<ul>
+<li><strong>Geodesic solver</strong>: Multi-component cost function combining:
+<ul>
+<li><code>α·inv_m0</code>: Semantic mass preference (favor central concepts)</li>
+<li><code>β·vad</code>: Affective dimension matching</li>
+<li><code>γ·rel</code>: Relation type appropriateness</li>
+<li><code>λ·overlay</code>: Runtime learned preferences</li>
+</ul></li>
+<li><strong>Explainability</strong>: JSON traces (<code>gds.explain.path@v1</code>) documenting:
+<ul>
+<li>Traversed nodes and edges</li>
+<li>Cost breakdown per component</li>
+<li>Reasoning margin (confidence)</li>
+</ul></li>
+</ul>
+</section>
+<section id="learning-subsystem" class="level3">
+<h3 class="anchored" data-anchor-id="learning-subsystem">4. Learning Subsystem</h3>
+<p><strong>Physics-inspired autonomous learning</strong>:</p>
+<ul>
+<li><strong>Local Hebbian updates</strong>: Edge strengthening based on usage patterns</li>
+<li><strong>Validation gates</strong>: Telemetry-based checks before consolidating learned changes</li>
+<li><strong>Diffusion smoothing</strong>: L2 decay prevents overfitting to specific paths</li>
+<li><strong>Margin-gain optimization</strong>: Focus learning on high-uncertainty decisions</li>
+</ul>
+</section>
+</section>
+<section id="technology-stack" class="level2">
+<h2 class="anchored" data-anchor-id="technology-stack">Technology Stack</h2>
+<table class="table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 35%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>Technology</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Core Logic</td>
+<td>Rust</td>
+<td>Reasoning engine, graph operations, I/O</td>
+</tr>
+<tr class="even">
+<td>Vector Expansion</td>
+<td>Julia</td>
+<td>HDC hypervector generation from embeddings</td>
+</tr>
+<tr class="odd">
+<td>Storage</td>
+<td>Parquet + ZSTD</td>
+<td>Compressed columnar lexicon storage</td>
+</tr>
+<tr class="even">
+<td>Overlay</td>
+<td>LMDB</td>
+<td>Runtime delta store with checkpointing</td>
+</tr>
+<tr class="odd">
+<td>Indexing</td>
+<td>FAISS (binary)</td>
+<td>k-NN similarity search for graph construction</td>
+</tr>
+<tr class="even">
+<td>FFI</td>
+<td>JSON over stdin/stdout</td>
+<td>Rust ↔︎ Julia communication</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="data-sources">Data Sources</h2>
+<p>The research prototype integrates multiple knowledge bases:</p>
+<ul>
+<li><strong>ConceptNet 5</strong>: ~2.1M curated semantic assertions (140k concepts after filtering)</li>
+<li><strong>ConceptNet Numberbatch</strong>: 300D multilingual embeddings</li>
+<li><strong>NRC-VAD Lexicon</strong>: Affective dimensions for emotional reasoning</li>
+<li><strong>OEWN (Open English WordNet)</strong>: Lexical taxonomy and relationships</li>
+</ul>
+</section>
+<section id="implementation-highlights" class="level2">
+<h2 class="anchored" data-anchor-id="implementation-highlights">Implementation Highlights</h2>
+<section id="storage-optimization-journey" class="level3">
+<h3 class="anchored" data-anchor-id="storage-optimization-journey">Storage Optimization Journey</h3>
+<p>The project achieved <strong>~800x storage reduction</strong> through progressive optimization:</p>
+<ol type="1">
+<li>Initial projection: <strong>6TB</strong> for full lexicon (300D floats + metadata)</li>
+<li>Binary HDC encoding: Reduced to <strong>~68GB</strong> (20k-bit vectors)</li>
+<li>Parquet columnar storage: Final <strong>~7.5GB</strong> (with ZSTD compression)</li>
+</ol>
+</section>
+<section id="csi-hdc-tokenization" class="level3">
+<h3 class="anchored" data-anchor-id="csi-hdc-tokenization">CSI-HDC Tokenization</h3>
+<p>Conceptual State Injector using Hyperdimensional Computing (CSI-HDC) replaces traditional neural tokenizers:</p>
+<ul>
+<li><strong>Input</strong>: Concept identifier (e.g., <code>"en/cat"</code>, <code>"ro/calculator"</code>)</li>
+<li><strong>Process</strong>: Julia HDC server expands 300D embedding → 20,000D binary vector</li>
+<li><strong>Output</strong>: Semantic particle ready for graph-based reasoning</li>
+<li><strong>Advantage</strong>: Interpretable, multilingual, compositional</li>
+</ul>
+</section>
+<section id="cross-language-capabilities" class="level3">
+<h3 class="anchored" data-anchor-id="cross-language-capabilities">Cross-Language Capabilities</h3>
+<p>The system demonstrates multilingual semantic reasoning:</p>
+<ul>
+<li><strong>English</strong>: Primary language (140k concepts)</li>
+<li><strong>Romanian</strong>: Secondary language (~200k concepts)</li>
+<li><strong>Shared HDC space</strong>: Cross-lingual concept alignment via Numberbatch embeddings</li>
+<li><strong>Relation preservation</strong>: Language-agnostic graph structure</li>
+</ul>
+</section>
+</section>
+<section id="current-research-status" class="level2">
+<h2 class="anchored" data-anchor-id="current-research-status">Current Research Status</h2>
+<p>GDS is a <strong>proof-of-concept prototype</strong> demonstrating:</p>
+<p>✅ <strong>Operational CSI-HDC tokenization</strong> (20k-dimensional binary vectors)<br>
+✅ <strong>Functional graph-based reasoning</strong> with explainable paths<br>
+✅ <strong>Autonomous learning gates</strong> with validation<br>
+✅ <strong>Efficient storage</strong> (Parquet + LMDB architecture)<br>
+✅ <strong>Multilingual capabilities</strong> (EN/RO)</p>
+<p>This architecture represents an exploration of <strong>physics-inspired semantic reasoning</strong>, not a production system. All design decisions prioritize research interpretability and experimental flexibility.</p>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further Reading</h2>
+<ul>
+<li><strong><a href="../01_ModelCard_GDS_Details.html">Model Card</a></strong>: Detailed specifications and capabilities</li>
+<li><strong><a href="../02_Chronicle_GDS.html">Development Chronicle</a></strong>: Engineering journey and optimizations</li>
+<li><strong><a href="../GDS_Concept/citations.html">Citations</a></strong>: Academic references and data sources</li>
+</ul>
+<hr>
+<p><em>This architecture serves the <strong>Independent Research &amp; Development Genesis</strong> initiative exploring novel AI paradigms. For questions or collaboration: <a href="mailto:mihai.mateescu@web.de">mihai.mateescu@web.de</a></em></p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script src="../gds_particles.js"></script>"
+
+
+
+
+</body></html>

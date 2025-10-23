@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>GDS Deep Dive - Chronicle P05: The Training Journey</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+
+
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/tabby.min.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+
+</head>
+
+<body>
+
+<div id="tsparticles"></div>
+
+<header id="title-block-header">
+<h1 class="title">Chronicle P05: The Training Journey</h1>
+<p class="subtitle">A voyage through chaos, discovery, and revelation</p>
+
+</header>
+
+
+<style>
+/* =====================================================================
+   COSMIC DARK MODE GLASSMORPHISM - ADVANCED SCROLLYTELLING DESIGN
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+    /* Cosmic Color Palette */
+    --cosmic-void: #0A0E27;
+    --deep-space: #131729;
+    --nebula-purple: #1a1a2e;
+    --star-blue: #00d4ff;
+    --galaxy-cyan: #00fff5;
+    --pulsar-magenta: #ff006e;
+    --aurora-green: #39ff14;
+    --solar-gold: #ffd700;
+    
+    /* Glass Effects */
+    --glass-bg: rgba(26, 26, 46, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    
+    /* Typography */
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, var(--cosmic-void) 0%, var(--deep-space) 50%, var(--nebula-purple) 100%);
+    background-attachment: fixed;
+    color: #e0e0e0;
+    font-family: var(--font-body);
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+
+/* Cosmic Background Animation */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20% 30%, rgba(0, 212, 255, 0.3), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(255, 0, 110, 0.3), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(0, 255, 245, 0.2), transparent),
+        radial-gradient(1px 1px at 80% 10%, rgba(57, 255, 20, 0.2), transparent);
+    background-size: 200px 200px, 300px 300px, 250px 250px, 350px 350px;
+    background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+    animation: cosmic-drift 60s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+}
+
+@keyframes cosmic-drift {
+    0% { background-position: 0 0, 40px 60px, 130px 270px, 70px 100px; }
+    100% { background-position: 200px 200px, 240px 260px, 330px 470px, 270px 300px; }
+}
+
+/* Header Styling */
+.article-header {
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 2rem;
+}
+
+.article-header h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--star-blue), var(--galaxy-cyan), var(--pulsar-magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+}
+
+.article-header .subtitle {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    color: var(--galaxy-cyan);
+    font-weight: 300;
+    font-style: italic;
+}
+
+/* =====================================================================
+   PORTAL SYSTEM - SOLUTION TO QUARTO'S TRANSFORM PROBLEM
+   ===================================================================== */
+
+/* Portal Target - Positioned independently, OUTSIDE Quarto's transform context */
+#scrolly-portal-target {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 52%;
+    height: 100vh;
+    z-index: 10;
+    pointer-events: none;
+}
+
+#scrolly-portal-target > * {
+    pointer-events: auto;
+}
+
+/* Source Container (will be emptied and moved to portal) */
+#scrolly-graphic-source {
+    /* This will be hidden once content is moved */
+    display: none;
+}
+
+/* Scrollytelling Container */
+.scrollytelling-container {
+    position: relative;
+    width: 100%;
+    min-height: 400vh;
+    z-index: 1;
+}
+
+/* Text Column (Left Side) */
+.scrolly-text-column {
+    position: relative;
+    width: 48%;
+    padding: 2rem;
+    padding-right: 3rem;
+    padding-top: 350px;
+    z-index: 2;
+}
+
+/* Story Steps */
+.story-step {
+    min-height: 100vh;
+    margin-bottom: 40vh;
+    padding: 2.5rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow);
+    opacity: 0.4;
+    transform: scale(0.95);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.story-step.active {
+    opacity: 1;
+    transform: scale(1);
+    border-color: var(--star-blue);
+    box-shadow: 
+        var(--glass-shadow),
+        0 0 40px rgba(0, 212, 255, 0.3),
+        inset 0 0 60px rgba(0, 212, 255, 0.05);
+}
+
+.story-step:last-child {
+    margin-bottom: 20vh;
+}
+
+.story-step h2 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--star-blue);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.story-step h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--galaxy-cyan);
+    margin-top: 1.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.story-step p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #d0d0d0;
+}
+
+.story-step strong {
+    color: var(--solar-gold);
+    font-weight: 600;
+}
+
+.story-step em {
+    color: var(--galaxy-cyan);
+    font-style: italic;
+}
+
+.story-step code {
+    font-family: var(--font-mono);
+    background: rgba(0, 212, 255, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    color: var(--star-blue);
+    font-size: 0.95em;
+}
+
+.story-step ul, .story-step ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.story-step li {
+    margin-bottom: 0.5rem;
+}
+
+.story-step blockquote {
+    border-left: 4px solid var(--pulsar-magenta);
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    color: var(--galaxy-cyan);
+    font-style: italic;
+}
+
+.story-step pre {
+    background: rgba(0, 212, 255, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--star-blue);
+    overflow-x: auto;
+}
+
+/* Visualization Container (Right Side - Fixed) */
+.scrolly-viz-container {
+    position: fixed;
+    top: 320px;
+    right: 2rem;
+    width: calc(48% - 3rem);
+    height: calc(100vh - 340px);
+    background: var(--glass-bg);
+    backdrop-filter: blur(25px) saturate(200%);
+    border: 2px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: 
+        var(--glass-shadow),
+        0 0 60px rgba(0, 212, 255, 0.2);
+    padding: 1.5rem;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.scrolly-viz-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.05) 0%, transparent 70%);
+    animation: pulse-glow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+.viz-header {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    color: var(--galaxy-cyan);
+    margin-bottom: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.viz-frame {
+    width: 100%;
+    height: calc(100% - 3rem);
+    border: none;
+    border-radius: 16px;
+    background: rgba(10, 14, 39, 0.6);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.viz-frame.active {
+    opacity: 1;
+}
+
+/* Loading State */
+.viz-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--star-blue);
+    font-family: var(--font-heading);
+}
+
+.viz-loading::after {
+    content: '...';
+    display: inline-block;
+    animation: loading-dots 1.5s infinite;
+}
+
+@keyframes loading-dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    #scrolly-portal-target {
+        width: 100%;
+        position: relative;
+        height: 60vh;
+        margin-bottom: 2rem;
+    }
+    
+    .scrolly-text-column {
+        width: 100%;
+        padding: 1rem;
+        padding-top: 1rem;
+    }
+    
+    .scrolly-viz-container {
+        position: relative;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 60vh;
+        margin-bottom: 2rem;
+    }
+    
+    .story-step {
+        min-height: 60vh;
+        margin-bottom: 20vh;
+    }
+}
+
+/* Accessibility */
+.story-step:focus-within {
+    outline: 2px solid var(--star-blue);
+    outline-offset: 4px;
+}
+
+/* Print Styles */
+@media print {
+    body::before {
+        display: none;
+    }
+    
+    .scrolly-viz-container {
+        position: relative;
+        page-break-inside: avoid;
+    }
+    
+    .story-step {
+        page-break-inside: avoid;
+        margin-bottom: 2rem;
+    }
+}
+</style>
+<div class="article-header">
+    <h1>The Training Journey</h1>
+    <p class="subtitle">From chaos to revelation: A chronicle of GDS learning</p>
+</div>
+
+<!-- Portal Target: This exists OUTSIDE Quarto's transform context -->
+<div id="scrolly-portal-target"></div>
+
+<!-- Visualization Source (will be moved to portal) -->
+<div id="scrolly-graphic-source">
+    <div class="scrolly-viz-container">
+        <div class="viz-header">Training Visualization</div>
+        <div id="viz-loading" class="viz-loading">Loading visualization</div>
+        <iframe id="viz-frame-1" class="viz-frame" data-src="training_graphics/1_data_reliance_streamgraph.html"></iframe>
+        <iframe id="viz-frame-2" class="viz-frame" data-src="training_graphics/2_query_trajectories_small_multiples.html"></iframe>
+        <iframe id="viz-frame-3" class="viz-frame" data-src="training_graphics/3_confidence_ribbon.html"></iframe>
+        <iframe id="viz-frame-4" class="viz-frame" data-src="training_graphics/4_performance_distribution_ridgeline.html"></iframe>
+        <iframe id="viz-frame-5" class="viz-frame" data-src="training_graphics/5_pathfinder_highlight_Q4.html"></iframe>
+    </div>
+</div>
+
+<!-- Scrollytelling Container -->
+<div class="scrollytelling-container">
+    <div class="scrolly-text-column">
+        
+        <!-- Step 1: Introduction -->
+        <div class="story-step" data-viz="1">
+            <h2 class="anchored">🌌 Epoch 1-2: The Genesis</h2>
+            <h3 class="anchored">The Birth of Structure from Chaos</h3>
+            <p>
+                In the beginning, there was <strong>chaos</strong>. The GDS model awakened into a sparse semantic universe, 
+                armed with only <em>40 natural training examples</em> and a vast, largely empty knowledge graph.
+            </p>
+            <p>
+                The <strong>Streamgraph</strong> reveals the brutal truth of early training: <code>97.3% synthetic fallback rate</code>. 
+                The model couldn't find real paths through the knowledge graph, so it hallucinated connections, 
+                creating synthetic "bridges" through the void.
+            </p>
+            <p>
+                Yet even in this primordial state, patterns emerged. The <em>data reliance layers</em> show three distinct strata:
+            </p>
+            <ul>
+                <li><strong style="color: var(--aurora-green);">Natural Layer</strong> (2.7%): Genuine semantic connections</li>
+                <li><strong style="color: var(--solar-gold);">Synthetic Domain</strong> (0%): Attempted structured inference</li>
+                <li><strong style="color: var(--pulsar-magenta);">Random Fallback</strong> (97.3%): Pure chaos</li>
+            </ul>
+            <p>
+                This is the <em>baseline reality</em>: a model searching desperately for meaning in a semantic desert.
+            </p>
+        </div>
+        
+        <!-- Step 2: Query Diversity -->
+        <div class="story-step" data-viz="2">
+            <h2 class="anchored">🎯 Epoch 2-3: Twelve Paths Diverge</h2>
+            <h3 class="anchored">The Cartography of Inference</h3>
+            <p>
+                Not all queries are created equal. The <strong>Small Multiples</strong> visualization reveals the stark diversity 
+                of inference difficulty across the 12 test queries.
+            </p>
+            <p>
+                <strong>Query Q11</strong> (<code>"borwasserstoffverbindung → compound"</code>) found its path almost immediately: 
+                <em>cost = 0.960</em>. A direct, elegant connection through the German-English chemistry bridge.
+            </p>
+            <p>
+                But <strong>Query Q4</strong> (<code>"peptide → compound → entgegen"</code>) struggled catastrophically: 
+                <em>cost = 7.70</em>. The model wandered through semantic wilderness, making bizarre leaps from 
+                biochemistry to German adverbs.
+            </p>
+            <p>
+                Each mini-chart tells a story:
+            </p>
+            <ul>
+                <li><strong>Stable convergence</strong> (Q2, Q5, Q11): Quick learning, minimal variance</li>
+                <li><strong>Slow descent</strong> (Q6, Q7, Q9): Gradual improvement over epochs</li>
+                <li><strong>Plateau of confusion</strong> (Q4, Q8, Q10): Stuck in local minima</li>
+            </ul>
+            <p>
+                The training trajectories expose a fundamental truth: <em>sparse data creates uneven learning landscapes</em>.
+            </p>
+        </div>
+        
+        <!-- Step 3: Confidence Evolution -->
+        <div class="story-step" data-viz="3">
+            <h2 class="anchored">📊 Epoch 1-3: The Confidence Paradox</h2>
+            <h3 class="anchored">Precision in the Midst of Chaos</h3>
+            <p>
+                The <strong>Confidence Ribbon</strong> chart reveals the model's internal uncertainty through <em>margin</em> 
+                and <em>path cost</em> distributions over three epochs.
+            </p>
+            <p>
+                <strong>Margin</strong> (model confidence) remained eerily stable:
+            </p>
+            <ul>
+                <li>Mean: <code>~0.334</code> across all epochs</li>
+                <li>Std Dev: <code>~0.237</code> (70% relative variation)</li>
+                <li>Range: <code>0.3 → 2.85</code> (nearly 10× spread)</li>
+            </ul>
+            <p>
+                <strong>Path Cost</strong> (inference efficiency) showed microscopic improvement:
+            </p>
+            <ul>
+                <li>Epoch 1: <code>2.8743 ± 1.8135</code></li>
+                <li>Epoch 3: <code>2.8741 ± 1.8134</code></li>
+                <li>Change: <code>-0.0002</code> (0.007% improvement)</li>
+            </ul>
+            <p>
+                The shaded ribbons expose the <em>confidence paradox</em>: the model achieved high precision in its predictions, 
+                but that precision was built on a foundation of synthetic hallucinations. It was <strong>confidently wrong</strong>.
+            </p>
+            <p>
+                The narrow variance in <code>overlay_delta</code> (0.020 ± 0.004) shows the model learned to be 
+                <em>consistently uncertain</em> — a form of meta-learning about its own limitations.
+            </p>
+        </div>
+        
+        <!-- Step 4: Performance Distribution -->
+        <div class="story-step" data-viz="4">
+            <h2 class="anchored">🏔️ The Ridgeline Revelation</h2>
+            <h3 class="anchored">Visualizing the Distribution of Understanding</h3>
+            <p>
+                The <strong>Ridgeline Plot</strong> stacks the performance distributions across epochs like geological strata, 
+                revealing the <em>shape of learning</em>.
+            </p>
+            <p>
+                Three mountain ranges emerge:
+            </p>
+            <ul>
+                <li>
+                    <strong style="color: var(--aurora-green);">Low-Cost Peak</strong> (0.5-2.0): 
+                    The "easy queries" — Q11, Q2, Q5 — cluster here. These are the model's confident victories.
+                </li>
+                <li>
+                    <strong style="color: var(--solar-gold);">Mid-Range Plateau</strong> (2.5-4.0): 
+                    The majority of queries, showing moderate difficulty. Steady improvement visible across epochs.
+                </li>
+                <li>
+                    <strong style="color: var(--pulsar-magenta);">High-Cost Outliers</strong> (&gt;6.0): 
+                    Q4 and Q6 dominate this region. These are semantic "black holes" where inference collapses.
+                </li>
+            </ul>
+            <p>
+                The ridgelines barely shift between epochs. This is the <em>crisis moment</em>: 
+                <strong>the model wasn't learning, it was memorizing a sparse pattern space</strong>.
+            </p>
+            <p>
+                The distribution reveals what the mean values hid: a bimodal learning landscape where some queries 
+                are trivial and others are impossible, with no middle ground for gradual improvement.
+            </p>
+        </div>
+        
+        <!-- Step 5: The Pathfinder -->
+        <div class="story-step" data-viz="5">
+            <h2 class="anchored">🔍 The Pathfinder: Q4 Dissected</h2>
+            <h3 class="anchored">Anatomy of a Semantic Dead End</h3>
+            <p>
+                <strong>Query Q4</strong> became the <em>crucible of understanding</em>. With a cost of <code>7.70</code>, 
+                it represents the most expensive inference in the entire training set.
+            </p>
+            <p>
+                The <strong>Network Graph</strong> highlights the inference path:
+            </p>
+            <pre><code>peptide → compound → entgegen</code></pre>
+            <p>
+                <strong>Why did this fail?</strong>
+            </p>
+            <ul>
+                <li>
+                    <em>peptide → compound</em>: A logical biochemical connection (cost: ~1.5)
+                </li>
+                <li>
+                    <em>compound → entgegen</em>: A catastrophic semantic leap (cost: ~6.2)
+                </li>
+            </ul>
+            <p>
+                "Entgegen" is a German preposition meaning "against" or "contrary to." The model attempted to connect 
+                it to "compound" through spurious etymological or contextual associations that don't exist in the 
+                knowledge graph.
+            </p>
+            <p>
+                This path illuminates the <strong>central crisis</strong>:
+            </p>
+            <blockquote>
+                <em>"The model cannot learn what isn't there. No amount of training on 40 examples can bridge 
+                the semantic void between 'chemical compound' and 'German preposition.' The problem isn't the 
+                algorithm — it's the sparsity of the data substrate."</em>
+            </blockquote>
+            <p>
+                The highlighted path shows the model's desperate attempt to force a connection through 
+                <strong>three distinct semantic domains</strong>: biochemistry → chemistry → linguistics. 
+                Each hop added massive cost, yet the model persisted, trapped in a local minimum.
+            </p>
+            <p>
+                This is the <strong>revelation</strong>: <em>v2-v4 weren't failing because of bad algorithms. 
+                They were failing because they were trying to learn from a dataset that couldn't teach them what they needed to know.</em>
+            </p>
+        </div>
+        
+        <!-- Epilogue -->
+        <div class="story-step" data-viz="5">
+            <h2 class="anchored">✨ Epilogue: The Path Forward</h2>
+            <h3 class="anchored">From Diagnosis to Solution</h3>
+            <p>
+                The training journey revealed a fundamental truth about machine learning: 
+                <strong>data quality trumps algorithmic sophistication</strong>.
+            </p>
+            <p>
+                The visualizations told a story of:
+            </p>
+            <ul>
+                <li><strong>Synthetic dependence</strong>: 97% hallucinated connections</li>
+                <li><strong>Uneven learning</strong>: Bimodal difficulty distribution</li>
+                <li><strong>Confident ignorance</strong>: Stable margins on unstable foundations</li>
+                <li><strong>Semantic voids</strong>: Unbridgeable gaps in the knowledge graph</li>
+            </ul>
+            <p>
+                The solution wasn't to train harder or longer. It was to <em>enrich the semantic substrate</em>:
+            </p>
+            <ol>
+                <li><strong>BabelNet integration</strong>: Expanded coverage from 15% to 80%</li>
+                <li><strong>Multi-lingual bridges</strong>: Connected isolated semantic islands</li>
+                <li><strong>Domain enrichment</strong>: Filled critical gaps in specialized vocabularies</li>
+            </ol>
+            <p>
+                The journey from v2 to v5 wasn't a story of algorithmic triumph. It was a story of 
+                <strong>diagnostic humility</strong> — learning to read the signals hidden in the noise, 
+                understanding that sometimes the model is telling you <em>"I can't learn because you haven't given me what I need to know."</em>
+            </p>
+            <p style="text-align: center; margin-top: 2rem; font-family: var(--font-heading); font-size: 1.3rem; color: var(--galaxy-cyan);">
+                This is the art of machine learning: <strong>listening to what the data cannot say</strong>.
+            </p>
+        </div>
+        
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+// =====================================================================
+// SCROLLYTELLING ENGINE - PORTAL-BASED SOLUTION
+// =====================================================================
+
+(function() {
+    'use strict';
+    
+    // Wait for DOM to be fully loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initScrollytelling);
+    } else {
+        initScrollytelling();
+    }
+    
+    function initScrollytelling() {
+        console.log('🚀 Initializing GDS Training Journey Scrollytelling');
+        
+        // STEP 1: PORTAL SYSTEM - Move viz container outside Quarto's transform context
+        const portalTarget = document.getElementById('scrolly-portal-target');
+        const vizSource = document.getElementById('scrolly-graphic-source');
+        
+        if (!portalTarget || !vizSource) {
+            console.error('❌ Portal elements not found!');
+            return;
+        }
+        
+        // Move all children from source to target
+        while (vizSource.firstChild) {
+            portalTarget.appendChild(vizSource.firstChild);
+        }
+        
+        console.log('✅ Portal system activated - viz container moved outside transform context');
+        
+        // STEP 2: INITIALIZE GSAP SCROLLTRIGGER
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // STEP 3: GET ALL VISUALIZATION FRAMES
+        const vizFrames = {
+            1: document.getElementById('viz-frame-1'),
+            2: document.getElementById('viz-frame-2'),
+            3: document.getElementById('viz-frame-3'),
+            4: document.getElementById('viz-frame-4'),
+            5: document.getElementById('viz-frame-5')
+        };
+        
+        const vizLoading = document.getElementById('viz-loading');
+        let currentViz = null;
+        let loadedFrames = new Set();
+        
+        // STEP 4: LAZY LOAD AND SWITCH VISUALIZATIONS
+        function switchVisualization(vizNumber) {
+            if (currentViz === vizNumber) return;
+            
+            console.log(`📊 Switching to visualization ${vizNumber}`);
+            
+            // Hide all frames
+            Object.values(vizFrames).forEach(frame => {
+                if (frame) frame.classList.remove('active');
+            });
+            
+            // Show loading state
+            if (vizLoading) vizLoading.style.display = 'block';
+            
+            // Get target frame
+            const targetFrame = vizFrames[vizNumber];
+            if (!targetFrame) {
+                console.error(`❌ Frame ${vizNumber} not found`);
+                return;
+            }
+            
+            // Lazy load if not loaded yet
+            if (!loadedFrames.has(vizNumber)) {
+                const src = targetFrame.getAttribute('data-src');
+                if (src) {
+                    targetFrame.src = src;
+                    loadedFrames.add(vizNumber);
+                    console.log(`📥 Loading visualization ${vizNumber}: ${src}`);
+                    
+                    // Wait for load
+                    targetFrame.addEventListener('load', function onLoad() {
+                        targetFrame.removeEventListener('load', onLoad);
+                        if (vizLoading) vizLoading.style.display = 'none';
+                        targetFrame.classList.add('active');
+                        console.log(`✅ Visualization ${vizNumber} loaded`);
+                    });
+                    
+                    // Timeout fallback
+                    setTimeout(() => {
+                        if (vizLoading) vizLoading.style.display = 'none';
+                        targetFrame.classList.add('active');
+                    }, 2000);
+                }
+            } else {
+                // Already loaded, show immediately
+                if (vizLoading) vizLoading.style.display = 'none';
+                targetFrame.classList.add('active');
+            }
+            
+            currentViz = vizNumber;
+        }
+        
+        // STEP 5: SETUP SCROLL TRIGGERS FOR EACH STORY STEP
+        const storySteps = gsap.utils.toArray('.story-step');
+        
+        storySteps.forEach((step, index) => {
+            const vizNumber = parseInt(step.getAttribute('data-viz')) || (index + 1);
+            
+            ScrollTrigger.create({
+                trigger: step,
+                start: 'top center',
+                end: 'bottom center',
+                onEnter: () => {
+                    console.log(`👆 Entering step ${index + 1}`);
+                    step.classList.add('active');
+                    switchVisualization(vizNumber);
+                },
+                onEnterBack: () => {
+                    console.log(`👇 Entering back step ${index + 1}`);
+                    step.classList.add('active');
+                    switchVisualization(vizNumber);
+                },
+                onLeave: () => {
+                    step.classList.remove('active');
+                },
+                onLeaveBack: () => {
+                    step.classList.remove('active');
+                }
+            });
+        });
+        
+        // STEP 6: INITIALIZE FIRST VISUALIZATION
+        if (storySteps.length > 0) {
+            const firstViz = parseInt(storySteps[0].getAttribute('data-viz')) || 1;
+            switchVisualization(firstViz);
+        }
+        
+        // STEP 7: REFRESH SCROLLTRIGGER ON RESIZE
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                ScrollTrigger.refresh();
+                console.log('🔄 ScrollTrigger refreshed on resize');
+            }, 250);
+        });
+        
+        console.log('✨ Scrollytelling engine initialized successfully');
+        console.log(`📖 Loaded ${storySteps.length} story steps`);
+    }
+})();
+</script>
+
+
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+  tabsets.forEach(function(tabset) {
+    const tabby = new Tabby('#' + tabset.id);
+  });
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'light-border',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script src="./gds_particles.js"></script>"
+
+
+
+
+</body></html>
